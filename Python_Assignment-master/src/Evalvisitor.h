@@ -90,11 +90,11 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     vector<dvar>v1,v2;
     v1 = visit (ctx->testlist (ctx->testlist().size() - 1)).as<vector<dvar>>();
     if(ctx->testlist().size() == 1) return nullptr;
-    for(int i = 0; i < ctx->testlist(1)->test().size(); ++i)
-    {
-      vector<dvar> xx = visit(ctx->testlist(1)->test(i)).as<vector<dvar>>();
-      //cout <<xx[0] << endl;
-    }
+    // for(int i = 0; i < ctx->testlist(1)->test().size(); ++i)
+    // {
+    //   vector<dvar> xx = visit(ctx->testlist(1)->test(i)).as<vector<dvar>>();
+    //   cout <<xx[0] << endl;
+    // }
     if(ctx->augassign())
     {
       v2 = visit (ctx->testlist(0)).as<vector<dvar>>();
@@ -599,7 +599,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
       v1 = visit(ctx->test(i)).as<vector<dvar>>();
       if(!v1.empty())
       {
-        tmp = v1[0];cout << tmp;
+        tmp = v1[0];
         v2.push_back(tmp);
       }
     return v2;
