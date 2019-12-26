@@ -422,7 +422,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
 
   }
 
-  virtual antlrcpp::Any visitAtom_expr(Python3Parser::Atom_exprContext *ctx) override {
+  virtual antlrcpp::Any visitAtom_expr(Python3Parser::Atom_exprContext *ctx)  {
     if(ctx->trailer()) 
     {
         string funcname = ctx->atom()->NAME()->toString();
@@ -443,6 +443,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
               if(i != v.size() - 1) cout << ' ';
             }
             cout << '\n';
+            if(!v.empty())
             v.clear();
             return v;
 
@@ -528,11 +529,12 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
             vector<dvar> vre = tmp.as<vector<dvar>>();
             the_stack.pop();
             return vre;
-          }
-          
-          
+          }  
+          if(!v1.empty())
+          v1.clear();
+          return v1;
         }
-        return nullptr;
+        
 
     }
     
