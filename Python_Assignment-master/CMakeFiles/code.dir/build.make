@@ -246,6 +246,7 @@ code: CMakeFiles/code.dir/src/Int.cpp.o
 code: CMakeFiles/code.dir/src/dvar.cpp.o
 code: CMakeFiles/code.dir/src/main.cpp.o
 code: CMakeFiles/code.dir/build.make
+code: libantlr4-cpp-runtime.a
 code: CMakeFiles/code.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/freme/homework/Python_Assignment-master/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX executable code"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/code.dir/link.txt --verbose=$(VERBOSE)
