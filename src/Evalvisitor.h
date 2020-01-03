@@ -532,6 +532,8 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
           while(iter != globalvar .end())
           {
             curvar[iter->first] = iter->second;
+            ++iter;
+            
           }
           the_stack.push(curvar);
           antlrcpp::Any tmp = visit(suite[funcname]);
@@ -600,6 +602,10 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     {
       return vector<dvar>(1,dvar(ctx->FALSE()->toString()));
     }
+       if(ctx->test())
+    {
+      return visit(ctx->test());
+    }
 
     return v;
     
@@ -616,9 +622,8 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
         tmp = v1[0];
         v2.push_back(tmp);
       }
+    }
     return v2;
-    
-  }
   }
 
   // virtual antlrcpp::Any visitArglist(Python3Parser::ArglistContext *ctx) override {
