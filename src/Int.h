@@ -99,6 +99,7 @@ class Int
     }
     Int& operator= (const Int &tmp)
     {
+        if(p)
         delete [] p;
         size = tmp.size;
         flag = tmp.flag;
