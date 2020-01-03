@@ -20,6 +20,10 @@ void ass(vector<dvar> & v)
   for(int i = 0; i < v.size(); ++i)
   if(v[i].gettype() == is_varname) v[i] = the_stack.top()[v[i].getstring()];
 }
+bool check(const antlrcpp::Any &tmp)
+{
+  return (tmp.is<vector<dvar>>()) ? true:false;
+}
 struct OP
 {
   int flag;
@@ -78,7 +82,9 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
   }
 
   virtual antlrcpp::Any visitSimple_stmt(Python3Parser::Simple_stmtContext *ctx) override {
+    if(ctx->small_stmt())
     return visit(ctx->small_stmt());
+    return nullptr;
   }
 
   virtual antlrcpp::Any visitSmall_stmt(Python3Parser::Small_stmtContext *ctx) override {
@@ -88,16 +94,11 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
 
   virtual antlrcpp::Any visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx) override {
     vector<dvar>v1,v2;
-    v1 = visit (ctx->testlist (ctx->testlist().size() - 1)).as<vector<dvar>>();
-    if(ctx->testlist().size() == 1) return nullptr;
-    // for(int i = 0; i < ctx->testlist(1)->test().size(); ++i)
-    // {
-    //   vector<dvar> xx = visit(ctx->testlist(1)->test(i)).as<vector<dvar>>();
-    //   cout <<xx[0] << endl;
-    // }
+    v1 = visit(ctx->testlist(ctx->testlist().size() - 1)).as<vector<dvar>>();
+    if(ctx->testlist().size() == 1) return v2;
     if(ctx->augassign())
     {
-      v2 = visit (ctx->testlist(0)).as<vector<dvar>>();
+      v2 = visit(ctx->testlist(0)).as<vector<dvar>>();
       ass(v1);
       switch (ctx->augassign()->getText()[0])
       {
@@ -178,7 +179,6 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     }
     if(ctx->return_stmt())
     return visit(ctx->return_stmt());
-
     return nullptr;
   }
 
@@ -192,8 +192,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
 
   virtual antlrcpp::Any visitReturn_stmt(Python3Parser::Return_stmtContext *ctx) override {
     if(ctx->testlist() == nullptr) return (vector<flowName>(1,is_return));
-    vector<dvar> v = visit(ctx->testlist()).as<vector<dvar>>();
-    return v;
+    return visit(ctx->testlist());
   }
 
   virtual antlrcpp::Any visitCompound_stmt(Python3Parser::Compound_stmtContext *ctx) override {
@@ -212,7 +211,9 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
       if(v[0].getbool()) 
       {
         tmp = visit(ctx->suite(i));
-        return nullptr;
+        if(tmp.is<vector<dvar>>() && !tmp.as<vector<dvar>>().empty())
+          return tmp;
+          return nullptr;
       }
     }
     if(ctx->ELSE())
@@ -233,6 +234,8 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
         if (v[0] == is_return) return v;
 
       }
+      if(tmp.is<vector<dvar>>() && !tmp.as<vector<dvar>>().empty())
+      return tmp;
     }
     return nullptr;
   }
@@ -341,7 +344,11 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
 
   virtual antlrcpp::Any visitArith_expr(Python3Parser::Arith_exprContext *ctx) override {
     int cnt1  = ctx->ADD().size(), cnt2 = ctx->MINUS().size(),i = 0;
-    vector<dvar> v1  = visit(ctx->term(0)).as<vector<dvar>>(), v2;
+    antlrcpp::Any an = visit(ctx->term(0));
+    vector<dvar> v2,v1;
+    if(an.is<vector<dvar>>())
+    v1 = an.as<vector<dvar>>();
+    
     if(ctx->term().size() == 1) return v1;
     ass(v1);
     vector<OP> am;
@@ -366,7 +373,11 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
   }
 
   virtual antlrcpp::Any visitTerm(Python3Parser::TermContext *ctx) override {
-    vector<dvar> v1 = visit(ctx->factor(0)).as<vector<dvar>>(), v2;
+    antlrcpp::Any an = visit(ctx->factor(0));
+    vector<dvar> v2,v1;
+    if(an.is<vector<dvar>>())
+    v1 = an.as<vector<dvar>>();
+    
     if(ctx->factor().size() == 1) return v1;
     ass(v1);
     int c1 = ctx->STAR().size(), c2 = ctx->DIV().size(), c3 = ctx->IDIV().size(), c4 = ctx->MOD().size();
@@ -530,6 +541,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
             the_stack.pop();
             return vre;
           }  
+          the_stack.pop();
           if(!v1.empty())
           v1.clear();
           return v1;

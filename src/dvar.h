@@ -208,7 +208,7 @@ explicit operator Int() const
             for(; i < svar.length(); ++i)
                 if (svar[i] == '.') break;
             if (i <= svar.length() - 1)
-                tmpstr = svar.substr(i + 1, svar.length() - (i + 1));
+                tmpstr = svar.substr(0, i);
             else tmpstr = svar;
             tmp = Int(tmpstr,flag);
             break;
@@ -268,7 +268,12 @@ explicit operator double() const
 
 explicit operator std::string() const 
 {
-   return svar;
+    std::string tmp = "-";
+    if(flag == -1 && (type == is_float || type == is_Int))
+    tmp += svar;
+    else 
+    tmp = svar;
+    return tmp;
 }
 
 dvar to_bool() 

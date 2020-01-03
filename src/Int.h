@@ -166,7 +166,7 @@ class Int
         }
         if(flag == -1)
         {
-            for (int i = 1;i < size;++i)
+            for (int i = 0;i < size;++i)
             tmp = 10.0 * tmp + (double)(p[i] - '0');
             return -tmp;
         }
@@ -231,7 +231,7 @@ bool operator>= (const Int &I1, const Int &I2)
 }
 bool operator!= (const Int &I1, const Int &I2)
 {
-    return I1 == I2;
+    return !(I1 == I2);
 }
 Int operator+ (const Int &I1, const Int &I2)
 {
