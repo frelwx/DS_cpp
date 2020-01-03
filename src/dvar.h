@@ -31,7 +31,7 @@ class dvar
     double fvar;
     std::string svar;
     typeName type;
-    flowName flow;
+    
     int flag;
     
     public:
@@ -50,7 +50,7 @@ class dvar
         svar = tmp.getstring();
         type = tmp.gettype();
         flag = tmp.getflag();
-        flow = tmp.getflow();
+        
         return *this;
     }
     dvar (const dvar &tmp)
@@ -61,7 +61,7 @@ class dvar
         svar = tmp.getstring();
         type = tmp.gettype();
         flag = tmp.getflag();
-        flow = tmp.getflow();
+        
     }
 	explicit dvar(std::string const &s)
     {
@@ -321,10 +321,7 @@ typeName gettype() const
 {
     return type;
 }
-flowName getflow()const
-{
-    return flow;
-}
+
 int getflag() const
 {
     return flag;
