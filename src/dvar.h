@@ -7,7 +7,7 @@
 #include"Int.h"
 #include <iomanip>
 #include<cmath>
-enum typeName{is_none, is_bool, is_Int, is_float, is_string, is_varname, is_flow};
+//enum typeName{is_none, is_bool, is_Int, is_float, is_string, is_varname, is_flow};
 enum flowName{is_break, is_return, is_continue};
 class dvar
 {
