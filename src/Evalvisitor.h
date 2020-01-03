@@ -559,9 +559,9 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     
   }
 
-  // virtual antlrcpp::Any visitTrailer(Python3Parser::TrailerContext *ctx) override {
-  //   return visit(ctx->arglist());
-  // }
+   virtual antlrcpp::Any visitTrailer(Python3Parser::TrailerContext *ctx) override {
+     return visit(ctx->arglist());
+   }
 
   virtual antlrcpp::Any visitAtom(Python3Parser::AtomContext *ctx) override {
     vector<dvar> v;

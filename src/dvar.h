@@ -6,6 +6,7 @@
 #include<cstdio>
 #include"Int.h"
 #include <iomanip>
+#include<cmath>
 enum typeName{is_none, is_bool, is_Int, is_float, is_string, is_varname, is_flow};
 enum flowName{is_break, is_return, is_continue};
 class dvar
@@ -483,7 +484,7 @@ dvar operator== (const dvar &I1, const dvar &I2)
     }
     if(max_convert == is_float)
     {
-        tmp = dvar((double)I1 - (double)I2 < 1e-5);
+        tmp = dvar(fabs((double)I1 - (double)I2) < 1e-7);
         return tmp;
     }
     if(max_convert == is_Int)
