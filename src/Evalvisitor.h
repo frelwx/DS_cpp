@@ -11,7 +11,7 @@
 #include"Int.h"
 #include<algorithm>
 using std::vector, std::string,std::cout, std::endl;
-
+enum flowName{is_break, is_return, is_continue};
 std::stack<std::map<std::string, dvar>> the_stack; //variables
 std::map<std::string , Python3Parser::SuiteContext*> suite; // suite of function
 std::map<std::string, Python3Parser::TypedargslistContext*> tyarg; // argslist of function
@@ -95,7 +95,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
   virtual antlrcpp::Any visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx) override {
     vector<dvar>v1,v2;
     v1 = visit(ctx->testlist(ctx->testlist().size() - 1)).as<vector<dvar>>();
-    if(ctx->testlist().size() == 1) return v2;
+    if(ctx->testlist().size() == 1) return nullptr;
     if(ctx->augassign())
     {
       v2 = visit(ctx->testlist(0)).as<vector<dvar>>();
@@ -192,7 +192,9 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
 
   virtual antlrcpp::Any visitReturn_stmt(Python3Parser::Return_stmtContext *ctx) override {
     if(ctx->testlist() == nullptr) return (vector<flowName>(1,is_return));
-    return visit(ctx->testlist());
+    vector<dvar> v=visit(ctx->testlist()).as<vector<dvar>>();ass(v);
+    //cout << v[0];
+    return v;
   }
 
   virtual antlrcpp::Any visitCompound_stmt(Python3Parser::Compound_stmtContext *ctx) override {
@@ -441,11 +443,12 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
         { 
             int n = ctx->trailer()->arglist()->argument().size();
             vector<dvar> v;
-            dvar tmp;
+            vector<dvar> tmp;
             for(int i = 0; i < n; ++i) 
             {
-              tmp = visit(ctx->trailer()->arglist()->argument(i)->test()).as<vector<dvar>>()[0];
-              v.push_back(tmp); 
+              tmp = visit(ctx->trailer()->arglist()->argument(i)->test()).as<vector<dvar>>();
+              for(int j = 0; j < tmp.size(); ++j)
+              v.push_back(tmp[j]); 
             }
             ass(v);
             for(int i = 0;i < v.size(); ++i)
@@ -546,6 +549,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
           the_stack.pop();
           if(!v1.empty())
           v1.clear();
+          if(check(tmp)) return tmp.as<vector<dvar>>();
           return v1;
         }
         
