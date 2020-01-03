@@ -8,20 +8,14 @@ using namespace antlr4;
 //       if you really need to regenerate,please ask TA for help.
 int main(int argc, const char* argv[]){
     //todo:please don't modify the code below the construction of ifs if you want to use visitor mode
-    const std::string filepath=argv[1];
-    // std::ifstream ifs;
-    // ifs.open(filepath);
-    // if (!ifs.good()) {
-    //     std::cout<<"bad";
-    // }
+
     ANTLRInputStream input(std::cin);
-    Python3Lexer lexer(&input); // 词法分析并转换成token流
+    Python3Lexer lexer(&input); 
     CommonTokenStream tokens(&lexer);
     tokens.fill();
     Python3Parser parser(&tokens);
-    tree::ParseTree* tree=parser.file_input(); //构建语法树
+    tree::ParseTree* tree=parser.file_input(); 
     EvalVisitor visitor;
-    visitor.visit(tree);//访问语法树
-    
+    visitor.visit(tree);
     return 0;
 }
