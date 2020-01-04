@@ -52,17 +52,22 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
       if(tmp.is<vector<flowName>>())
       {
         v = tmp.as<vector<flowName>>();
-        if (v[0] == is_return) return nullptr;
+        if (v[0] == is_return) 
+        {
+          
+          return nullptr;
+        }
       }
       
     }
+    
     return nullptr;
   }
 
   virtual antlrcpp::Any visitFuncdef(Python3Parser::FuncdefContext *ctx) override {
   suite[ctx->NAME()->toString()] = ctx->suite();
   tyarg[ctx->NAME()->toString()] = ctx->parameters()->typedargslist();
-  return nullptr;
+  return (vector<dvar>());
 
   }
 
@@ -86,7 +91,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
   virtual antlrcpp::Any visitSimple_stmt(Python3Parser::Simple_stmtContext *ctx) override {
     if(ctx->small_stmt())
     return visit(ctx->small_stmt());
-    return nullptr;
+    return (vector<dvar>());
   }
 
   virtual antlrcpp::Any visitSmall_stmt(Python3Parser::Small_stmtContext *ctx) override {
@@ -97,7 +102,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
   virtual antlrcpp::Any visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx) override {
     vector<dvar>v1,v2;
     v1 = visit(ctx->testlist(ctx->testlist().size() - 1)).as<vector<dvar>>();
-    if(ctx->testlist().size() == 1) return nullptr;
+    if(ctx->testlist().size() == 1) return (vector<dvar>());
     if(ctx->augassign())
     {
       v2 = visit(ctx->testlist(0)).as<vector<dvar>>();
@@ -147,7 +152,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
         }
         break;
       }
-      return nullptr;
+      return (vector<dvar>());
     }
 
     else// assignment
@@ -159,7 +164,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
           for(int j = 0; j < v2.size();++j)
           the_stack.top()[v2[j].getstring()] = v1[j];
       }
-      return nullptr;
+      return (vector<dvar>());
     }
   }
 
@@ -181,7 +186,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     }
     if(ctx->return_stmt())
     return visit(ctx->return_stmt());
-    return nullptr;
+    return (vector<dvar>());
   }
 
   virtual antlrcpp::Any visitBreak_stmt(Python3Parser::Break_stmtContext *ctx) override {
@@ -194,7 +199,8 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
 
   virtual antlrcpp::Any visitReturn_stmt(Python3Parser::Return_stmtContext *ctx) override {
     if(ctx->testlist() == nullptr) return (vector<flowName>(1,is_return));
-    vector<dvar> v=visit(ctx->testlist()).as<vector<dvar>>();ass(v);
+    vector<dvar> v=visit(ctx->testlist()).as<vector<dvar>>();
+    ass(v);
     
     return v;
   }
@@ -219,7 +225,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     }
     if(ctx->ELSE())
     return visit(ctx->suite(ctx->test().size()));
-    return nullptr;
+    return (vector<dvar>());
   }
 
   virtual antlrcpp::Any visitWhile_stmt(Python3Parser::While_stmtContext *ctx) override {
@@ -238,7 +244,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
       if(tmp.is<vector<dvar>>() && !tmp.as<vector<dvar>>().empty())
       return tmp;
     }
-    return nullptr;
+    return (vector<dvar>());
   }
 
   virtual antlrcpp::Any visitSuite(Python3Parser::SuiteContext *ctx) override {
@@ -250,7 +256,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
       if(tmp.is<vector<flowName>>() || ( tmp.is<vector<dvar>>() && !tmp.as<vector<dvar>>().empty()))
       return tmp;
     }
-    return nullptr;
+    return (vector<dvar>());
   }
 
   virtual antlrcpp::Any visitTest(Python3Parser::TestContext *ctx) override {
@@ -344,11 +350,9 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
   }
 
   virtual antlrcpp::Any visitArith_expr(Python3Parser::Arith_exprContext *ctx) override {
-    int cnt1  = ctx->ADD().size(), cnt2 = ctx->MINUS().size(),i = 0;
-    antlrcpp::Any an = visit(ctx->term(0));
+    int cnt1  = ctx->ADD().size(), cnt2 = ctx->MINUS().size();
     vector<dvar> v2,v1;
-    if(an.is<vector<dvar>>())
-    v1 = an.as<vector<dvar>>();
+    v1= visit(ctx->term(0)).as<vector<dvar>>();
     
     if(ctx->term().size() == 1) return v1;
     ass(v1);
@@ -374,11 +378,9 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
   }
 
   virtual antlrcpp::Any visitTerm(Python3Parser::TermContext *ctx) override {
-    antlrcpp::Any an = visit(ctx->factor(0));
     vector<dvar> v2,v1;
-    if(an.is<vector<dvar>>())
-    v1 = an.as<vector<dvar>>();
-    
+    v1= visit(ctx->factor(0)).as<vector<dvar>>();
+     
     if(ctx->factor().size() == 1) return v1;
     ass(v1);
     int c1 = ctx->STAR().size(), c2 = ctx->DIV().size(), c3 = ctx->IDIV().size(), c4 = ctx->MOD().size();
@@ -387,11 +389,11 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     for(int i = 0; i < c1; ++i)
     am.push_back({1, (int)ctx->STAR(i)->getSymbol()->getTokenIndex()});
     for(int i = 0; i < c2; ++i)
-    am.push_back({2,(int)ctx->DIV(i)->getSymbol()->getTokenIndex()});
+    am.push_back({2, (int)ctx->DIV(i)->getSymbol()->getTokenIndex()});
     for(int i = 0; i < c3; ++i)
     am.push_back({3, (int)ctx->IDIV(i)->getSymbol()->getTokenIndex()});
     for(int i = 0; i < c4; ++i)
-    am.push_back({4,(int)ctx->MOD(i)->getSymbol()->getTokenIndex()});
+    am.push_back({4, (int)ctx->MOD(i)->getSymbol()->getTokenIndex()});
     std::sort(am.begin(), am.end(),cp);
     dvar tmp = v1[0];
     for(int i = 0; i < am.size() ; ++i)
@@ -401,7 +403,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
       switch (am[i].flag)
       {
         case 1:
-        {tmp *= v2[0];cout << tmp << endl;}
+        tmp *= v2[0];
         break;
 
         case 2:
@@ -464,7 +466,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
         else if (funcname == string("int"))
         {
           vector <dvar> v = visit(ctx->trailer()->arglist()->argument()[0]->test()) .as<vector<dvar>>();
-          if(v[0].gettype() == is_varname)  v[0] = the_stack.top()[v[0].getstring()];
+          ass(v);
           v[0].to_Int();
           return v;
         }
@@ -472,7 +474,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
         else if (funcname == string("float"))
         {
           vector <dvar> v = visit(ctx->trailer()->arglist()->argument()[0]->test()) .as<vector<dvar>>();
-          if(v[0].gettype() == is_varname)  v[0] = the_stack.top()[v[0].getstring()];
+          ass(v);
           v[0].to_double();
           return v;
         }
@@ -480,19 +482,20 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
         else if(funcname == string("str"))
         {
           vector <dvar> v = visit(ctx->trailer()->arglist()->argument()[0]->test()) .as<vector<dvar>>();
-          if(v[0].gettype() == is_varname)  v[0] = the_stack.top()[v[0].getstring()];
+          ass(v);
           v[0].to_string();
           return v;
         }
         else if(funcname == string("bool"))
         {
           vector <dvar> v = visit(ctx->trailer()->arglist()->argument()[0]->test()) .as<vector<dvar> >();
-          if(v[0].gettype() == is_varname)  v[0] = the_stack.top()[v[0].getstring()];
+          ass(v);
           v[0].to_bool();
           return v;
         }
         else // func
         {
+          ++foo;
           vector<dvar> v1;
           vector<string> t;
           std::map<string,dvar> curvar;
@@ -503,11 +506,9 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
           {
             curvar[iter->first] = iter->second;
             ++iter;
-            
           }
           if(tyarg[funcname])
           {
-            ++foo;
             int i = 0;
             for(i = 0; i < tyarg[funcname]->tfpdef().size(); ++i)
             t.push_back(tyarg[funcname]->tfpdef(i)->NAME()->toString());
@@ -535,7 +536,6 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
               {
                 v1 = visit(ctx->trailer()->arglist()->argument(i)->test()).as<vector<dvar>>();
                 ass(v1);
-                string tmp111 = tyarg[funcname]->tfpdef(i)->NAME()->toString();
                 curvar[tyarg[funcname]->tfpdef(i)->NAME()->toString()] = v1[0];
               }
               
@@ -544,7 +544,6 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
           
           the_stack.push(curvar);
           antlrcpp::Any tmp = visit(suite[funcname]);
-
           --foo;
           std::map<string,dvar> update_globalvar = the_stack.top();
           the_stack.pop();
@@ -554,7 +553,6 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
             if(std::find(t.begin(),t.end(),iter2->first) == t.end())
             the_stack.top()[iter2->first] = update_globalvar[iter2->first];
             ++iter2;
-            
           }
           
           if(check(tmp)) return tmp;
@@ -631,11 +629,9 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     for (int i = 0; i < ctx->test().size(); ++i)
     {
       v1 = visit(ctx->test(i)).as<vector<dvar>>();
-      if(!v1.empty())
-      {
-        for(int j = 0; j < v1.size(); ++j)
-        v2.push_back(v1[j]);
-      }
+      for(int j = 0; j < v1.size(); ++j)
+      v2.push_back(v1[j]);
+      
     }
     return v2;
   }
