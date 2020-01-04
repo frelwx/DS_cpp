@@ -67,7 +67,13 @@ class dvar
         flag = 1;
         switch(s[0])
         {
-            case '\"' :
+            case '\"'  :
+            { 
+                type = is_string; 
+                svar = s.substr(1, s.length() - 2);
+                break;
+            }
+             case '\''  :
             { 
                 type = is_string; 
                 svar = s.substr(1, s.length() - 2);
