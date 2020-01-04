@@ -548,20 +548,14 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
           std::map<string,dvar>::iterator iter2 = the_stack.top().begin();
           while(iter2 != the_stack.top().end())
           {
-            the_stack.top()[iter2->first] = update_globalvar[iter2->first];
+            //the_stack.top()[iter2->first] = update_globalvar[iter2->first];
             ++iter2;
             
           }
           
-          if(tmp.is<vector<dvar>>())
-          {
-            vector<dvar> vre = tmp.as<vector<dvar>>();
-            return vre;
-          }  
-          
+          if(check(tmp)) return tmp;
           if(!v1.empty())
           v1.clear();
-          if(check(tmp)) return tmp.as<vector<dvar>>();
           return v1;
         }
         
