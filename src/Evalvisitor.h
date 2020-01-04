@@ -12,6 +12,7 @@
 #include<algorithm>
 using std::vector, std::string,std::cout, std::endl;
 enum flowName{is_break, is_return, is_continue};
+int foo = 0;//  recursion state
 std::stack<std::map<std::string, dvar>> the_stack; //variables
 std::map<std::string , Python3Parser::SuiteContext*> suite; // suite of function
 std::map<std::string, Python3Parser::TypedargslistContext*> tyarg; // argslist of function
@@ -41,6 +42,7 @@ class EvalVisitor: public Python3BaseVisitor {
 virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) override {
     std::map<string,dvar>v1;
     the_stack.push(v1);
+    ++foo;
     vector<flowName> v;
     antlrcpp::Any tmp;
 
@@ -504,6 +506,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
           }
           if(tyarg[funcname])
           {
+            ++foo;
             int i = 0;
             for(i = 0; i < tyarg[funcname]->tfpdef().size() - tyarg[funcname]->test().size(); ++i)
             curvar[tyarg[funcname]->tfpdef(i)->NAME()->toString()] = dvar(false);
@@ -538,13 +541,24 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
           
           the_stack.push(curvar);
           antlrcpp::Any tmp = visit(suite[funcname]);
+
+          --foo;
+          std::map<string,dvar> update_globalvar = the_stack.top();
+          the_stack.pop();
+          std::map<string,dvar>::iterator iter2 = the_stack.top().begin();
+          while(iter2 != the_stack.top().end())
+          {
+            the_stack.top()[iter2->first] = update_globalvar[iter2->first];
+            ++iter2;
+            
+          }
+          
           if(tmp.is<vector<dvar>>())
           {
             vector<dvar> vre = tmp.as<vector<dvar>>();
-            the_stack.pop();
             return vre;
           }  
-          the_stack.pop();
+          
           if(!v1.empty())
           v1.clear();
           if(check(tmp)) return tmp.as<vector<dvar>>();
