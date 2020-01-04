@@ -206,20 +206,18 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
   virtual antlrcpp::Any visitIf_stmt(Python3Parser::If_stmtContext *ctx) override {
     vector<dvar>v;
     antlrcpp::Any tmp;
-    int i = 0;
-    for(; i < ctx->test().size(); ++i)
+    
+    for(int i = 0; i < ctx->test().size() -1 ; ++i)
     {
       v = visit(ctx->test(i)).as<vector<dvar>>();
       if(v[0].getbool()) 
       {
-        tmp = visit(ctx->suite(i));
-        if(tmp.is<vector<dvar>>() && !tmp.as<vector<dvar>>().empty())
-          return tmp;
+          tmp = visit(ctx->suite(i));
           return nullptr;
       }
     }
     if(ctx->ELSE())
-    tmp =  visit(ctx->suite(i));
+    tmp =  visit(ctx->suite(ctx->test().size() - 1));
     return nullptr;
   }
 
@@ -355,9 +353,9 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     ass(v1);
     vector<OP> am;
     for(int i = 0; i < cnt1; ++i)
-    am.push_back({1, ctx->ADD(i)->getSymbol()->getTokenIndex()});
+    am.push_back({1, (int)ctx->ADD(i)->getSymbol()->getTokenIndex()});
     for(int i = 0; i < cnt2; ++i)
-    am.push_back({0,ctx->MINUS(i)->getSymbol()->getTokenIndex()});
+    am.push_back({0,(int)ctx->MINUS(i)->getSymbol()->getTokenIndex()});
     std:sort(am.begin(),am.end(),cp);
     dvar tmp = v1[0];
     for(int i = 0; i < am.size() ; ++i)
@@ -386,13 +384,13 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     vector<OP> am;
     OP TMP;
     for(int i = 0; i < c1; ++i)
-    am.push_back({1, ctx->STAR(i)->getSymbol()->getTokenIndex()});
+    am.push_back({1, (int)ctx->STAR(i)->getSymbol()->getTokenIndex()});
     for(int i = 0; i < c2; ++i)
-    am.push_back({2,ctx->DIV(i)->getSymbol()->getTokenIndex()});
+    am.push_back({2,(int)ctx->DIV(i)->getSymbol()->getTokenIndex()});
     for(int i = 0; i < c3; ++i)
-    am.push_back({3, ctx->IDIV(i)->getSymbol()->getTokenIndex()});
+    am.push_back({3, (int)ctx->IDIV(i)->getSymbol()->getTokenIndex()});
     for(int i = 0; i < c4; ++i)
-    am.push_back({4,ctx->MOD(i)->getSymbol()->getTokenIndex()});
+    am.push_back({4,(int)ctx->MOD(i)->getSymbol()->getTokenIndex()});
     std::sort(am.begin(), am.end(),cp);
     dvar tmp = v1[0];
     for(int i = 0; i < am.size() ; ++i)
