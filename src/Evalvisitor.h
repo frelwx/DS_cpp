@@ -401,7 +401,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
       switch (am[i].flag)
       {
         case 1:
-        tmp *= v2[0];
+        {tmp *= v2[0];cout << tmp << endl;}
         break;
 
         case 2:

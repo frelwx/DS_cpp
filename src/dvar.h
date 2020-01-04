@@ -110,7 +110,7 @@ class dvar
                 for(; i < svar.length(); ++i) 
                     if (svar[i] == '.') break;
 
-                if(i <= svar.length() - 1) 
+                if(i < svar.length() - 1) 
                 {
                     type = is_float; 
                     fvar = atof(svar.c_str());
@@ -423,6 +423,9 @@ dvar operator* (const dvar &I1, const dvar &I2)
     if(max_convert == is_string)
     {
         std::string ans = "";
+        Int zero2(string("0"),1);
+        if(I1.gettype() == is_string && I2.getInt() == zero2 ||I2.gettype() == is_string && I1.getInt() == zero2 )
+        return dvar();
         if(I1.gettype() == is_string)
         for(Int i = Int("1"); i <= I2.getInt(); i += Int("1"))
         ans = ans + I1.getstring();
@@ -430,8 +433,8 @@ dvar operator* (const dvar &I1, const dvar &I2)
         else
         for(Int i = Int("1"); i <= I1.getInt(); i += Int("1"))
         ans = ans + I2.getstring();
-
-        return dvar(ans);
+        
+        return dvar(zero + ans + zero);
     }
     return tmp;
 }
