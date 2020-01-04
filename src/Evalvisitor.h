@@ -153,9 +153,9 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
       ass(v1);
       for(int i = ctx->testlist().size() - 2; i >= 0; --i)
       {
-        v2 = visit(ctx->testlist(i)).as<vector<dvar>>();
-        for(int j = 0; j < v2.size();++j)
-        the_stack.top()[v2[j].getstring()] = v1[j];
+          v2 = visit(ctx->testlist(i)).as<vector<dvar>>();
+          for(int j = 0; j < v2.size();++j)
+          the_stack.top()[v2[j].getstring()] = v1[j];
       }
       return nullptr;
     }
@@ -193,7 +193,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
   virtual antlrcpp::Any visitReturn_stmt(Python3Parser::Return_stmtContext *ctx) override {
     if(ctx->testlist() == nullptr) return (vector<flowName>(1,is_return));
     vector<dvar> v=visit(ctx->testlist()).as<vector<dvar>>();ass(v);
-    //cout << v[0];
+    
     return v;
   }
 
@@ -623,8 +623,8 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
       v1 = visit(ctx->test(i)).as<vector<dvar>>();
       if(!v1.empty())
       {
-        tmp = v1[0];
-        v2.push_back(tmp);
+        for(int j = 0; j < v1.size(); ++j)
+        v2.push_back(v1[j]);
       }
     }
     return v2;
