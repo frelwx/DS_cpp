@@ -143,14 +143,9 @@ class dvar
     explicit dvar(const double &tmp) 
     {
         fvar = tmp;
-        flag= 1;
+        flag= (tmp < 0) ? -1 : 1;
         type = is_float;
-        if(tmp < 0)
-        {
-            fvar = -fvar;
-            flag = -1;
-        }
-        svar = std::to_string(fvar);
+        svar = std::to_string(-fvar);;
     
     } 
 
@@ -320,7 +315,7 @@ bool getbool() const
 }
 double getfloat() const
 {
-    return fvar * flag;
+    return fvar;
 }
 Int getInt() const
 {
@@ -348,7 +343,7 @@ dvar &operator-= (const dvar & tmp)
     return (*this);
 }
 dvar &operator*= (const dvar & tmp)
-{
+{   
     *this = (*this) * tmp;
     return (*this);
 }
@@ -365,7 +360,7 @@ dvar &operator%= (const dvar & tmp)
     
 };
 
-dvar operator+ (const dvar &I1, const dvar &I2) //暂时不考虑两个bool相加
+dvar operator+ (const dvar &I1, const dvar &I2) 
 {
     int max_convert = std::max(I1.gettype(), I2.gettype());
     dvar tmp;
@@ -386,6 +381,11 @@ dvar operator+ (const dvar &I1, const dvar &I2) //暂时不考虑两个bool相�
         
         return tmp;
     }
+    if(max_convert == is_bool)
+    {   std::string strtmp =  std::to_string((bool)I1 + (bool)I2);
+        tmp = dvar(Int(strtmp));
+        return tmp;
+    }
     return tmp;
 }
 dvar operator- (const dvar &I1, const dvar &I2) 
@@ -402,6 +402,11 @@ dvar operator- (const dvar &I1, const dvar &I2)
         tmp = dvar((Int)I1 - (Int)I2);
         return tmp;
     }
+    if(max_convert == is_bool)
+    {   std::string strtmp =  std::to_string((bool)I1 - (bool)I2);
+        tmp = dvar(Int(strtmp));
+        return tmp;
+    }
     return tmp;
 }
 
@@ -416,7 +421,7 @@ dvar operator* (const dvar &I1, const dvar &I2)
         return tmp;
     }
     if(max_convert == is_Int)
-    {
+    {   
         tmp = dvar((Int)I1 * (Int)I2);
         return tmp;
     }
@@ -427,14 +432,25 @@ dvar operator* (const dvar &I1, const dvar &I2)
         if(I1.gettype() == is_string && I2.getInt() == zero2 ||I2.gettype() == is_string && I1.getInt() == zero2 )
         return dvar();
         if(I1.gettype() == is_string)
-        for(Int i = Int("1"); i <= I2.getInt(); i += Int("1"))
-        ans = ans + I1.getstring();
+        {   
+            Int a = Int(I2);
+            for(Int i = Int("1"); i <= a; i += Int("1"))
+            ans = ans + I1.getstring();
+        }
 
         else
-        for(Int i = Int("1"); i <= I1.getInt(); i += Int("1"))
-        ans = ans + I2.getstring();
+        {
+            Int a = Int(I1);
+            for(Int i = Int("1"); i <= a; i += Int("1"))
+            ans = ans + I2.getstring();
+        }
         
         return dvar(zero + ans + zero);
+    }
+    if(max_convert == is_bool)
+    {   std::string strtmp =  std::to_string((bool)I1 * (bool)I2);
+        tmp = dvar(Int(strtmp));
+        return tmp;
     }
     return tmp;
 }
@@ -451,6 +467,11 @@ dvar operator/ (const dvar &I1, const dvar &I2)
     if(max_convert == is_Int)
     {
         tmp = dvar((Int)I1 / (Int)I2);
+        return tmp;
+    }
+    if(max_convert == is_bool)
+    {   std::string strtmp =  std::to_string((bool)I1 / (bool)I2);
+        tmp = dvar(Int(strtmp));
         return tmp;
     }
     return tmp;

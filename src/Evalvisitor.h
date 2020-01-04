@@ -60,6 +60,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
       }
       
     }
+    the_stack.pop();
     return nullptr;
   }
 
@@ -236,7 +237,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
         v = tmp.as<vector<flowName>>();
         if (v[0] == is_break) return (vector<dvar>());
         if (v[0] == is_continue) continue;
-        if (v[0] == is_return) return (vector<flowName>(1,is_return));
+        if (v[0] == is_return) return tmp;
 
       }
       if(tmp.is<vector<dvar>>() && !tmp.as<vector<dvar>>().empty())
@@ -635,11 +636,9 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     for (int i = 0; i < ctx->test().size(); ++i)
     {
       v1 = visit(ctx->test(i)).as<vector<dvar>>();
-      if(!v1.empty())
-      {
-        for(int j = 0; j < v1.size(); ++j)
-        v2.push_back(v1[j]);
-      }
+      for(int j = 0; j < v1.size(); ++j)
+      v2.push_back(v1[j]);
+      
     }
     return v2;
   }
