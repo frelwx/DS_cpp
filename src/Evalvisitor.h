@@ -66,7 +66,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
   virtual antlrcpp::Any visitFuncdef(Python3Parser::FuncdefContext *ctx) override {
   suite[ctx->NAME()->toString()] = ctx->suite();
   tyarg[ctx->NAME()->toString()] = ctx->parameters()->typedargslist();
-  return nullptr;
+  return (vector<dvar>());
 
   }
 
@@ -90,7 +90,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
   virtual antlrcpp::Any visitSimple_stmt(Python3Parser::Simple_stmtContext *ctx) override {
     if(ctx->small_stmt())
     return visit(ctx->small_stmt());
-    return nullptr;
+    return (vector<dvar>());
   }
 
   virtual antlrcpp::Any visitSmall_stmt(Python3Parser::Small_stmtContext *ctx) override {
@@ -101,7 +101,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
   virtual antlrcpp::Any visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx) override {
     vector<dvar>v1,v2;
     v1 = visit(ctx->testlist(ctx->testlist().size() - 1)).as<vector<dvar>>();
-    if(ctx->testlist().size() == 1) return nullptr;
+    if(ctx->testlist().size() == 1) return v1;
     if(ctx->augassign())
     {
       v2 = visit(ctx->testlist(0)).as<vector<dvar>>();
@@ -151,7 +151,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
         }
         break;
       }
-      return nullptr;
+      return (vector<dvar>());
     }
 
     else// assignment
@@ -163,7 +163,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
           for(int j = 0; j < v2.size();++j)
           the_stack.top()[v2[j].getstring()] = v1[j];
       }
-      return nullptr;
+      return (vector<dvar>());
     }
   }
 
@@ -223,7 +223,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     }
     if(ctx->ELSE())
     return visit(ctx->suite(ctx->test().size()));
-    return nullptr;
+    return (vector<dvar>());
   }
 
   virtual antlrcpp::Any visitWhile_stmt(Python3Parser::While_stmtContext *ctx) override {
@@ -234,15 +234,15 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
       if(tmp.is<vector<flowName>>())
       {
         v = tmp.as<vector<flowName>>();
-        if (v[0] == is_break) break;
+        if (v[0] == is_break) return (vector<dvar>());
         if (v[0] == is_continue) continue;
-        if (v[0] == is_return) return v;
+        if (v[0] == is_return) return (vector<flowName>(1,is_return));
 
       }
       if(tmp.is<vector<dvar>>() && !tmp.as<vector<dvar>>().empty())
       return tmp;
     }
-    return nullptr;
+    return (vector<dvar>());
   }
 
   virtual antlrcpp::Any visitSuite(Python3Parser::SuiteContext *ctx) override {
@@ -254,7 +254,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
       if(tmp.is<vector<flowName>>() || ( tmp.is<vector<dvar>>() && !tmp.as<vector<dvar>>().empty()))
       return tmp;
     }
-    return nullptr;
+    return (vector<dvar>());
   }
 
   virtual antlrcpp::Any visitTest(Python3Parser::TestContext *ctx) override {
