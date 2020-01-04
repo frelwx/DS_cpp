@@ -52,11 +52,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
       if(tmp.is<vector<flowName>>())
       {
         v = tmp.as<vector<flowName>>();
-        if (v[0] == is_return) 
-        {
-          the_stack.pop();
-          return nullptr;
-        }
+        if (v[0] == is_return) return nullptr;
       }
       
     }
@@ -405,7 +401,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
       switch (am[i].flag)
       {
         case 1:
-        tmp *= v2[0];
+        {tmp *= v2[0];cout << tmp << endl;}
         break;
 
         case 2:
@@ -654,7 +650,6 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
 
 
 };
-
 
 
 #endif //PYTHON_INTERPRETER_EVALVISITOR_H
