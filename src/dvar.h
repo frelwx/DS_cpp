@@ -7,8 +7,8 @@
 #include"Int.h"
 #include <iomanip>
 #include<cmath>
-enum typeName{is_none, is_bool, is_Int, is_float, is_string, is_varname, is_flow};
-//enum flowName{is_break, is_return, is_continue};
+enum typeName{is_none, is_bool, is_Int, is_float, is_string, is_varname,  is_returnvar};
+
 class dvar
 {
     friend dvar operator+ (const dvar &I1, const dvar &I2);
@@ -31,7 +31,7 @@ class dvar
     double fvar;
     std::string svar;
     typeName type;
-    
+
     int flag;
     
     public:
@@ -50,7 +50,6 @@ class dvar
         svar = tmp.getstring();
         type = tmp.gettype();
         flag = tmp.getflag();
-        
         return *this;
     }
     dvar (const dvar &tmp)
@@ -61,7 +60,6 @@ class dvar
         svar = tmp.getstring();
         type = tmp.gettype();
         flag = tmp.getflag();
-        
     }
 	explicit dvar(std::string const &s)
     {
@@ -154,6 +152,11 @@ class dvar
     {
         type = is_varname;
         svar = tmp;
+        
+    }
+    void inireturn()
+    {
+        type = is_returnvar;
         
     }
 

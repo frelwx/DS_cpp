@@ -3,6 +3,7 @@
 #include<iostream>
 #include<cstring>
 #include<string>
+using std::string;
 
 class Int 
 {
@@ -21,18 +22,18 @@ class Int
     friend std::istream& operator>> (std::istream &os, Int &tmp);
 
     public:
-    char *p = nullptr;
+    std::string p;
     int size;
     int flag;
+    
     Int (const char *tmp) 
     {
         size = strlen(tmp);
-        p = new char [size + 10]();
 
         if(tmp[0] == '-') 
         {
             for(int i = 1; i < size;++i)
-                p[i - 1] = tmp[i];
+                p += tmp[i];
             flag = -1;
             --size;
         }
@@ -40,19 +41,17 @@ class Int
         {
             flag = 1;
             for(int i = 0;i < size;++i)
-                p[i] = tmp[i];
+                p += tmp[i];
         }
     }
 
     Int (const std::string &tmp) 
     {
         size = tmp.length();
-        p = new char [size + 10]();
-
         if(tmp[0] == '-') 
         {
             for(int i = 1; i < size;++i)
-                p[i - 1] = tmp[i];
+                p += tmp[i];
             flag = -1;
             --size;
         }
@@ -60,32 +59,28 @@ class Int
         {
             flag = 1;
             for(int i = 0;i < size;++i)
-                p[i] = tmp[i];
+                p += tmp[i];
         }
     }
     Int (const Int &tmp)
     {
         size = tmp.size;
         flag = tmp.flag;
-        p = new char [size + 10]();
-        for(int i = 0;i < size;++i)
-        p[i] = tmp.p[i];
+        p = tmp.p;
     }
-    Int (const char *tmp,int sign)
-    {
-        size = strlen(tmp);
-        p = new char [size + 10]();
-        for(int i = 0;i < size;++i)
-            p[i] = tmp[i];
-        flag = sign;
 
-    }
     Int (const std::string &tmp,int sign)
     {
         size = tmp.length();
-        p = new char [size + 10]();
+        p = tmp;
+        flag = sign;
+
+    }
+   Int (const char *tmp,int sign)
+    {
+        size = strlen(tmp);
         for(int i = 0;i < size;++i)
-            p[i] = tmp[i];
+            p += tmp[i];
         flag = sign;
 
     }
@@ -93,19 +88,16 @@ class Int
 
     Int ()
     {
-        p = nullptr;
+        p = "";
         size = 0;
         flag = 1;
     }
     Int& operator= (const Int &tmp)
     {
-        if(p)
-        delete [] p;
+        
         size = tmp.size;
         flag = tmp.flag;
-        p = new char [size + 10]();
-        for(int i = 0;i < size;++i)
-        p[i] = tmp.p[i];
+        p = tmp.p;
         return *this;
     }
     Int& operator+= (const Int &I2)
@@ -136,11 +128,11 @@ class Int
 
     ~Int()
     {
-        if(p) delete [] p;
+        
     }
     void modi ()
     {
-        p[size - 1] = '\0';
+        p.erase(size-1,1);
         --size;
         
     }
@@ -151,10 +143,7 @@ class Int
     }
     operator std::string ()const
     {
-        std::string a;
-        for(int i = 0; i < size; ++i)
-        a[i] = p[i];
-        return a;
+        return p;
     }
     operator double ()const
     {
@@ -182,13 +171,13 @@ class Int
     
 };
 
-bool operator> (const Int &I1, const Int &I2) // 自己都看不懂，gugugu
+bool operator> (const Int &I1, const Int &I2) 
 {
-    if (I1.flag > 0 && I2.flag < 0) return true; // 正数大于负数
-        else if (I1.flag < 0 && I2.flag > 0) return false; //负数小于正数
-            else if (I1.flag > 0 && I2.flag > 0) //两个正数的比较
+    if (I1.flag > 0 && I2.flag < 0) return true; 
+        else if (I1.flag < 0 && I2.flag > 0) return false;
+            else if (I1.flag > 0 && I2.flag > 0) 
                     {
-                        if(I1.size != I2.size) return I1.size > I2.size; //先判断位数
+                        if(I1.size != I2.size) return I1.size > I2.size; 
                             else //从高位向低位比较
                             {
                                 for (int i = 0;i <= I1.size -1 ;++i)
