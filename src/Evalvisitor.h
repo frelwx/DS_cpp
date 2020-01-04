@@ -494,6 +494,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
         else // func
         {
           vector<dvar> v1;
+          vector<string> t;
           std::map<string,dvar> curvar;
           std::map<string,dvar>::iterator iter;
           std::map<string,dvar> globalvar = the_stack.top();
@@ -508,8 +509,10 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
           {
             ++foo;
             int i = 0;
+            for(i = 0; i < tyarg[funcname]->tfpdef().size(); ++i)
+            t.push_back(tyarg[funcname]->tfpdef(i)->NAME()->toString());
             for(i = 0; i < tyarg[funcname]->tfpdef().size() - tyarg[funcname]->test().size(); ++i)
-            curvar[tyarg[funcname]->tfpdef(i)->NAME()->toString()] = dvar(false);
+            curvar[tyarg[funcname]->tfpdef(i)->NAME()->toString()] = dvar(string("None"));
             for(i = 0; i < tyarg[funcname]->test().size(); ++i)
             {
               v1 = visit(tyarg[funcname]->test(i)).as<vector<dvar>>();
@@ -548,7 +551,8 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
           std::map<string,dvar>::iterator iter2 = the_stack.top().begin();
           while(iter2 != the_stack.top().end())
           {
-            //the_stack.top()[iter2->first] = update_globalvar[iter2->first];
+            if(std::find(t.begin(),t.end(),iter2->first) == t.end())
+            the_stack.top()[iter2->first] = update_globalvar[iter2->first];
             ++iter2;
             
           }
@@ -636,13 +640,13 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     return v2;
   }
 
-  // virtual antlrcpp::Any visitArglist(Python3Parser::ArglistContext *ctx) override {
-  //   return visit(ctx->argument(0));
-  // }
+  virtual antlrcpp::Any visitArglist(Python3Parser::ArglistContext *ctx) override {
+    return visit(ctx->argument(0));
+  }
 
-  // virtual antlrcpp::Any visitArgument(Python3Parser::ArgumentContext *ctx) override {
-  //   return visit(ctx->test());
-  // }
+  virtual antlrcpp::Any visitArgument(Python3Parser::ArgumentContext *ctx) override {
+    return visit(ctx->test());
+  }
 
 
 };
