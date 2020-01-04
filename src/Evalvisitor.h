@@ -207,17 +207,16 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     vector<dvar>v;
     antlrcpp::Any tmp;
     
-    for(int i = 0; i < ctx->test().size() -1 ; ++i)
+    for(int i = 0; i < ctx->test().size() ; ++i)
     {
       v = visit(ctx->test(i)).as<vector<dvar>>();
       if(v[0].getbool()) 
       {
-          tmp = visit(ctx->suite(i));
-          return nullptr;
+          return visit(ctx->suite(i));
       }
     }
     if(ctx->ELSE())
-    tmp =  visit(ctx->suite(ctx->test().size() - 1));
+    return visit(ctx->suite(ctx->test().size()));
     return nullptr;
   }
 
@@ -494,6 +493,15 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
         {
           vector<dvar> v1;
           std::map<string,dvar> curvar;
+          std::map<string,dvar>::iterator iter;
+          std::map<string,dvar> globalvar = the_stack.top();
+          iter = globalvar.begin();
+          while(iter != globalvar .end())
+          {
+            curvar[iter->first] = iter->second;
+            ++iter;
+            
+          }
           if(tyarg[funcname])
           {
             int i = 0;
@@ -527,15 +535,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
               
             }
           }
-          std::map<string,dvar>::iterator iter;
-          std::map<string,dvar> globalvar = the_stack.top();
-          iter = globalvar.begin();
-          while(iter != globalvar .end())
-          {
-            curvar[iter->first] = iter->second;
-            ++iter;
-            
-          }
+          
           the_stack.push(curvar);
           antlrcpp::Any tmp = visit(suite[funcname]);
           if(tmp.is<vector<dvar>>())
