@@ -444,6 +444,11 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
         string funcname = ctx->atom()->NAME()->toString();
         if(funcname == string("print"))
         { 
+            if(ctx->trailer()->arglist() == nullptr)
+            {
+              cout << endl;
+              return vector<dvar>();
+            }
             int n = ctx->trailer()->arglist()->argument().size();
             vector<dvar> v;
             vector<dvar> tmp;
@@ -499,7 +504,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
         {
           ++foo;
           vector<dvar> v1;
-          vector<string> t;
+          vector<string> t; // record of typearglist's string
           std::map<string,dvar> curvar;
           std::map<string,dvar>::iterator iter;
           std::map<string,dvar> globalvar = the_stack.top();
@@ -512,35 +517,40 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
           if(tyarg[funcname])
           {
             int i = 0;
-            for(i = 0; i < tyarg[funcname]->tfpdef().size(); ++i)
+            for(i = 0; i < tyarg[funcname]->tfpdef().size(); ++i) // 记录形参
             t.push_back(tyarg[funcname]->tfpdef(i)->NAME()->toString());
+
             for(i = 0; i < tyarg[funcname]->tfpdef().size() - tyarg[funcname]->test().size(); ++i)
-            curvar[tyarg[funcname]->tfpdef(i)->NAME()->toString()] = dvar(string("None"));
+            curvar[tyarg[funcname]->tfpdef(i)->NAME()->toString()] = dvar(); // 记录未赋初值的形参
+
             for(i = 0; i < tyarg[funcname]->test().size(); ++i)
             {
               v1 = visit(tyarg[funcname]->test(i)).as<vector<dvar>>();
               ass(v1);
               size_t count = i + tyarg[funcname]->tfpdef().size() - tyarg[funcname]->test().size();
-              curvar[tyarg[funcname]->tfpdef(count)->NAME()->toString()] = v1[0];
+              curvar[tyarg[funcname]->tfpdef(count)->NAME()->toString()] = v1[0]; // 初始化形参
             }
-            
-            for(i = 0; i < ctx->trailer()->arglist()->argument().size(); ++i)
+
+            if(ctx->trailer()->arglist() != nullptr)
             {
-              if(ctx->trailer()->arglist()->argument(i)->NAME())
+              for(i = 0; i < ctx->trailer()->arglist()->argument().size(); ++i)
               {
-                v1 = visit(ctx->trailer()->arglist()->argument(i)->test()).as<vector<dvar>>();
-                ass(v1);
-                curvar[ctx->trailer()->arglist()->argument(i)->NAME()->toString()] = v1[0];
+                if(ctx->trailer()->arglist()->argument(i)->NAME()) // key
+                {
+                  v1 = visit(ctx->trailer()->arglist()->argument(i)->test()).as<vector<dvar>>();
+                  ass(v1);
+                  curvar[ctx->trailer()->arglist()->argument(i)->NAME()->toString()] = v1[0];
 
-              }
+                }
 
-              else
-              {
-                v1 = visit(ctx->trailer()->arglist()->argument(i)->test()).as<vector<dvar>>();
-                ass(v1);
-                curvar[tyarg[funcname]->tfpdef(i)->NAME()->toString()] = v1[0];
+                else
+                {
+                  v1 = visit(ctx->trailer()->arglist()->argument(i)->test()).as<vector<dvar>>();
+                  ass(v1);
+                  curvar[tyarg[funcname]->tfpdef(i)->NAME()->toString()] = v1[0];
+                }
+                
               }
-              
             }
           }
           
