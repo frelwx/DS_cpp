@@ -484,8 +484,14 @@ dvar operator% (const dvar &I1, const dvar &I2)
 
 dvar operator> (const dvar &I1, const dvar &I2)
 {
+     
     int max_convert = std::max(I1.gettype(), I2.gettype());
     dvar tmp;
+    if(I1.gettype() == is_none || I2.gettype() == is_none) 
+    {
+        tmp = dvar(false);
+        return tmp;
+    }
     if(max_convert == is_string) 
     {
         tmp = dvar(I1.getstring() > I2.getstring());
@@ -505,8 +511,14 @@ dvar operator> (const dvar &I1, const dvar &I2)
 }
 dvar operator== (const dvar &I1, const dvar &I2)
 {
+    
     int max_convert = std::max(I1.gettype(), I2.gettype());
     dvar tmp;
+    if(I1.gettype() == is_none || I2.gettype() == is_none) 
+    {
+        tmp = dvar(false);
+        return tmp;
+    }
     if(max_convert == is_string) 
     {
         tmp = dvar(I1.getstring() == I2.getstring());
@@ -526,18 +538,26 @@ dvar operator== (const dvar &I1, const dvar &I2)
 }
 dvar operator< (const dvar &I1, const dvar &I2)
 {
+    if(I1.gettype() == is_none || I2.gettype() == is_none) 
+    return dvar(false);
     return dvar(!((I1 > I2).getbool()) && !((I1 == I2).getbool()));
 }
  dvar operator>= (const dvar &I1, const dvar &I2)
 {
+    if(I1.gettype() == is_none || I2.gettype() == is_none) 
+    return dvar(false);
     return dvar(!((I1 < I2).getbool()));
 }
 dvar operator<= (const dvar &I1, const dvar &I2)
 {
+    if(I1.gettype() == is_none || I2.gettype() == is_none) 
+    return dvar(false);
     return dvar(!((I1 > I2).getbool()));
 }
 dvar operator!= (const dvar &I1, const dvar &I2)
 {
+    if(I1.gettype() == is_none || I2.gettype() == is_none) 
+    return dvar(false);
     bool tmp;
     return dvar(!((I1 == I2).getbool()));
 }
