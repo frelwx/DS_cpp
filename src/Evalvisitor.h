@@ -303,34 +303,36 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     if(ctx->arith_expr().size() == 1) return visit(ctx->arith_expr(0));
     vector<dvar> v1,v2,v;
     string Op;
+    v1 = visit(ctx->arith_expr(0)).as<vector<dvar>>();
+    ass(v1);
     for(int i = 1; i < ctx->arith_expr().size(); ++i)
     {
-      v1 = visit(ctx->arith_expr(i - 1)).as<vector<dvar>>();
-      v2 = visit(ctx->arith_expr(i)).as<vector<dvar>>();
-      ass(v1);ass(v2);
+      dvar tmp = v1[0];
+      v1 = visit(ctx->arith_expr(i)).as<vector<dvar>>();
+      ass(v1);
       Op = visit(ctx->comp_op(i - 1)).as<vector<dvar>>()[0].getstring();
       switch (Op[0])
       {
         case '=':
-        v = (v1[0] == v2[0]) ? vector<dvar>(1,dvar(true)):vector<dvar>(1,dvar(false));
+        v = (tmp == v1[0]) ? vector<dvar>(1,dvar(true)):vector<dvar>(1,dvar(false));
         break;
 
         case '!':
-        v = (v1[0] == v2[0]) ? vector<dvar>(1,dvar(false)):vector<dvar>(1,dvar(true));
+        v = (tmp == v1[0]) ? vector<dvar>(1,dvar(false)):vector<dvar>(1,dvar(true));
         break;
 
         case '>':
         if(Op.length() > 1)
-        v = (v1[0] >= v2[0]) ? vector<dvar>(1,dvar(true)):vector<dvar>(1,dvar(false));
+        v = (tmp >= v1[0]) ? vector<dvar>(1,dvar(true)):vector<dvar>(1,dvar(false));
         else
-        v = (v1[0] > v2[0]) ? vector<dvar>(1,dvar(true)):vector<dvar>(1,dvar(false));
+        v = (tmp > v1[0]) ? vector<dvar>(1,dvar(true)):vector<dvar>(1,dvar(false));
         break;
 
         case '<':
         if(Op.length() > 1)
-        v = (v1[0] <= v2[0]) ? vector<dvar>(1,dvar(true)):vector<dvar>(1,dvar(false));
+        v = (tmp <= v1[0]) ? vector<dvar>(1,dvar(true)):vector<dvar>(1,dvar(false));
         else
-        v = (v1[0] < v2[0]) ? vector<dvar>(1,dvar(true)):vector<dvar>(1,dvar(false));
+        v = (tmp < v1[0]) ? vector<dvar>(1,dvar(true)):vector<dvar>(1,dvar(false));
         break;
       }
       if(!v[0].getbool()) return v;
