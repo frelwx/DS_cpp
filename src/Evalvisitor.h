@@ -218,8 +218,8 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     for(int i = 0; i < ctx->test().size() ; ++i)
     {
       v = visit(ctx->test(i)).as<vector<dvar>>();
-      //ass(v);
-      if(v[0].getbool()) 
+      ass(v);
+      if((bool)v[0].getbool()) 
       {
           return visit(ctx->suite(i));
       }
@@ -231,8 +231,13 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
 
   virtual antlrcpp::Any visitWhile_stmt(Python3Parser::While_stmtContext *ctx) override {
     vector<flowName> v; antlrcpp::Any tmp;
-    while(visit(ctx->test()).as<vector<dvar>>()[0].getbool())
+    vector<dvar> v1;
+    
+    while(true)
     {
+      v1 = visit(ctx->test()).as<vector<dvar>>();
+      ass(v1);
+      if(!(bool)v1[0]) break;
       tmp = visit(ctx->suite());
       if(tmp.is<vector<flowName>>())
       {
