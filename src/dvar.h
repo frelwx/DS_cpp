@@ -42,6 +42,25 @@ class dvar
         svar = "None";
         bvar = false;
     }
+    dvar& operator= (const dvar & tmp)
+    {
+        bvar = tmp.getbool();
+        ivar = Int(tmp.getInt());
+        fvar = tmp.getfloat();
+        svar = tmp.getstring();
+        type = tmp.gettype();
+        flag = tmp.getflag();
+        return *this;
+    }
+    dvar (const dvar &tmp)
+    {
+        bvar = tmp.getbool();
+        ivar = Int(tmp.getInt());
+        fvar = tmp.getfloat();
+        svar = tmp.getstring();
+        type = tmp.gettype();
+        flag = tmp.getflag();
+    }
     
 	explicit dvar(std::string const &s)
     {
