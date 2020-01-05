@@ -5,7 +5,7 @@
 #include<string>
 #include<cstdio>
 #include"Int.h"
-#include <iomanip>
+//#include <iomanip>
 #include<cmath>
 enum typeName{is_none, is_bool, is_Int, is_float, is_string, is_varname,  is_returnvar};
 
@@ -37,30 +37,12 @@ class dvar
     public:
     dvar()
     {
-        type = is_string;
+        type = is_none;
         flag = 1;
-        svar = "";
+        svar = "None";
         bvar = false;
     }
-    dvar& operator= (const dvar & tmp)
-    {
-        bvar = tmp.getbool();
-        ivar = Int(tmp.getInt());
-        fvar = tmp.getfloat();
-        svar = tmp.getstring();
-        type = tmp.gettype();
-        flag = tmp.getflag();
-        return *this;
-    }
-    dvar (const dvar &tmp)
-    {
-        bvar = tmp.getbool();
-        ivar = Int(tmp.getInt());
-        fvar = tmp.getfloat();
-        svar = tmp.getstring();
-        type = tmp.gettype();
-        flag = tmp.getflag();
-    }
+    
 	explicit dvar(std::string const &s)
     {
         svar = s;
@@ -113,7 +95,7 @@ class dvar
                 if(i < svar.length() - 1) 
                 {
                     type = is_float; 
-                    fvar = atof(svar.c_str());
+                    fvar = atof(s.c_str());
                 } // convert to char* then to double
                     else
                         {
@@ -145,7 +127,10 @@ class dvar
         fvar = tmp;
         flag= (tmp < 0) ? -1 : 1;
         type = is_float;
-        svar = std::to_string(-fvar);;
+        if(flag < 0)
+        svar = std::to_string(-fvar);
+        else
+        svar = std::to_string(fvar);
     
     } 
 
@@ -155,11 +140,7 @@ class dvar
         svar = tmp;
         
     }
-    void inireturn()
-    {
-        type = is_returnvar;
-        
-    }
+ 
 
 explicit operator bool() const
 {
