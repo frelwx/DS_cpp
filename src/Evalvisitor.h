@@ -219,7 +219,8 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     {
       v = visit(ctx->test(i)).as<vector<dvar>>();
       ass(v);
-      if((bool)v[0].getbool()) 
+      
+      if((bool)v[0]) 
       {
           return visit(ctx->suite(i));
       }
