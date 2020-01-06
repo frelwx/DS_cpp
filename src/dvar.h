@@ -511,7 +511,7 @@ dvar operator> (const dvar &I1, const dvar &I2)
 }
 dvar operator== (const dvar &I1, const dvar &I2)
 {
-    if(I1.gettype() != I2.gettype() && (I1.gettype() == is_string || I2.gettype() == is_string)) return dvar(false);
+    
     
     int max_convert = std::max(I1.gettype(), I2.gettype());
     dvar tmp;
