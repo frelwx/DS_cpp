@@ -514,7 +514,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
          
           std::map<string,dvar> curvar;
           std::map<string,dvar>::iterator iter;
-          std::map<string,dvar> globalvar = the_stack[0];
+          std::map<string,dvar> globalvar = the_stack[the_stack.size() - 1];
           iter = globalvar.begin();
           while(iter != globalvar .end())
           {
@@ -524,8 +524,6 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
           if(tyarg[funcname])
           {
             int i = 0;
-            
-
             for(i = 0; i < tyarg[funcname]->tfpdef().size() - tyarg[funcname]->test().size(); ++i)
             curvar[tyarg[funcname]->tfpdef(i)->NAME()->toString()] = dvar(); // 记录未赋初值的形参
 
@@ -564,7 +562,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
           antlrcpp::Any tmp = visit(suite[funcname]);
           --foo;
         
-          the_stack.erase(the_stack.end());
+          the_stack.pop_back();
        
           
           if(check(tmp)) return tmp;
