@@ -514,7 +514,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
          
           std::map<string,dvar> curvar;
           std::map<string,dvar>::iterator iter;
-          std::map<string,dvar> globalvar = the_stack[the_stack.size() - 1];
+          std::map<string,dvar> globalvar = the_stack[0];
           iter = globalvar.begin();
           while(iter != globalvar .end())
           {
