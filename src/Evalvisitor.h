@@ -564,15 +564,15 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
           the_stack.push(curvar);
           antlrcpp::Any tmp = visit(suite[funcname]);
           --foo;
-          std::map<string,dvar> update_globalvar = the_stack.top();
+          //std::map<string,dvar> update_globalvar = the_stack.top();
           the_stack.pop();
-          std::map<string,dvar>::iterator iter2 = the_stack.top().begin();
-          while(iter2 != the_stack.top().end())
-          {
-            if(std::find(t.begin(),t.end(),iter2->first) == t.end())
-            the_stack.top()[iter2->first] = update_globalvar[iter2->first];
-            ++iter2;
-          }
+          //std::map<string,dvar>::iterator iter2 = the_stack.top().begin();
+          //while(iter2 != the_stack.top().end())
+          //{
+            //if(std::find(t.begin(),t.end(),iter2->first) == t.end())
+           //the_stack.top()[iter2->first] = update_globalvar[iter2->first];
+            //++iter2;
+          //}
           
           if(check(tmp)) return tmp;
           if(!v1.empty())
