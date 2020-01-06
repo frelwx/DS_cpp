@@ -5,7 +5,7 @@
 #include<string>
 #include<cstdio>
 #include"Int.h"
-//#include <iomanip>
+#include <iomanip>
 #include<cmath>
 enum typeName{is_none, is_bool, is_Int, is_float, is_string, is_varname,  is_returnvar};
 
@@ -254,7 +254,7 @@ explicit operator double() const
         }
         case is_string:
         {
-            tmp = double(Int(svar));
+            tmp = atof(svar.c_str());
             break;
         }
         case is_bool:
@@ -511,6 +511,7 @@ dvar operator> (const dvar &I1, const dvar &I2)
 }
 dvar operator== (const dvar &I1, const dvar &I2)
 {
+    if(I1.gettype() != I2.gettype()) return dvar(false);
     
     int max_convert = std::max(I1.gettype(), I2.gettype());
     dvar tmp;
