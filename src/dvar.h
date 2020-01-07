@@ -83,24 +83,24 @@ class dvar
 
             case 'T' :
             {
-                if(s == string("True"))
-                {
+                //if(s == string("True"))
+                //{
                     type = is_bool;
                     bvar = true;
                     break;
-                }
+                //}
                 
                 
             }
             case 'F' :
             {
 
-                if(s == string("False"))
-                {
+                //if(s == string("False"))
+                //{
                     type = is_bool;
                     bvar = false;
                     break;
-                }
+                //}
 
                 
             }
@@ -312,7 +312,7 @@ dvar to_double()
 
 dvar to_string() 
 {
-    *this = dvar(std::string(*this));
+    *this = dvar("\"" + std::string(*this) + "\"");
     return (*this);
 }
 
