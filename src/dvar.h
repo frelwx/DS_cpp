@@ -312,7 +312,7 @@ dvar to_double()
 
 dvar to_string() 
 {
-    *this = dvar("\"" + std::string(*this) + "\"");
+    *this = dvar(std::string(*this));
     return (*this);
 }
 
