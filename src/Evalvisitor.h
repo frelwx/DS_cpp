@@ -112,7 +112,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
         case '+':
         for(int i = 0; i < v1.size(); ++i)
         {
-          the_stack[the_stack.size() - 1][v2[i].getstring()] += v1[i];cout << v1[i].gettype();
+          the_stack[the_stack.size() - 1][v2[i].getstring()] += v1[i];
         }
         break;
 
