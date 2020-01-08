@@ -46,7 +46,22 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     vector<flowName> v;
     antlrcpp::Any tmp;
 
-    return visitChildren(ctx);
+    for(int i = 0; i < ctx->stmt().size(); ++i)
+    {
+      tmp = visit(ctx->stmt(i));
+      if(tmp.is<vector<flowName>>())
+      {
+        v = tmp.as<vector<flowName>>();
+        if (v[0] == is_return) 
+        {
+          
+          return nullptr;
+        }
+      }
+      
+    }
+    
+    return nullptr;
   }
 
   virtual antlrcpp::Any visitFuncdef(Python3Parser::FuncdefContext *ctx) override {
@@ -357,11 +372,20 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     am.push_back({0,(int)ctx->MINUS(i)->getSymbol()->getTokenIndex()});
     std:sort(am.begin(),am.end(),cp);
     dvar tmp = v1[0];
-    for(int i = 0; i < am.size() ; ++i)
+    string ope = ctx->getText(),add = "+",sub = "-";
+    vector<string> opp;
+    for(int i = 0;i < ope.length(); ++i) 
+    {
+        if(ope[i] == '+')
+        opp.push_back(add);
+        if(ope[i] == '-')
+        opp.push_back(sub);
+    }
+    for(int i = 0; i < opp.size() ; ++i)
     {
       v2 = visit(ctx->term(i + 1)).as<vector<dvar>>();
       ass(v2);
-      if(am[i].flag == 1) 
+      if(opp[i]== string("+")) 
         tmp += v2[0];
       else 
         tmp -= v2[0];
