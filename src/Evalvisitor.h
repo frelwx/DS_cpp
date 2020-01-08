@@ -359,36 +359,23 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
   }
 
   virtual antlrcpp::Any visitArith_expr(Python3Parser::Arith_exprContext *ctx) override {
-    int cnt1  = ctx->ADD().size(), cnt2 = ctx->MINUS().size();
     vector<dvar> v2,v1;
     v1= visit(ctx->term(0)).as<vector<dvar>>();
     
     if(ctx->term().size() == 1) return v1;
     ass(v1);
-    vector<OP> am;
-    for(int i = 0; i < cnt1; ++i)
-    am.push_back({1, (int)ctx->ADD(i)->getSymbol()->getTokenIndex()});
-    for(int i = 0; i < cnt2; ++i)
-    am.push_back({0,(int)ctx->MINUS(i)->getSymbol()->getTokenIndex()});
-    std:sort(am.begin(),am.end(),cp);
     dvar tmp = v1[0];
-    string ope = ctx->getText(),add = "+",sub = "-";
-    vector<string> opp;
-    for(int i = 0;i < ope.length(); ++i) 
+    string opp = ctx->getText();
+    opp.erase(0,ctx->term(0)->getText().length());
+    for(int i = 1; i < ctx->term().size() ; ++i)
     {
-        if(ope[i] == '+')
-        opp.push_back(add);
-        if(ope[i] == '-')
-        opp.push_back(sub);
-    }
-    for(int i = 0; i < opp.size() ; ++i)
-    {
-      v2 = visit(ctx->term(i + 1)).as<vector<dvar>>();
+      v2 = visit(ctx->term(i)).as<vector<dvar>>();
       ass(v2);
-      if(opp[i]== string("+")) 
+      if(opp[0 ]== '+') 
         tmp += v2[0];
       else 
         tmp -= v2[0];
+        opp.erase(0,ctx->term(i)->getText().length() + 1);
     }
     
     return (vector<dvar>(1,tmp));
@@ -401,39 +388,39 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
      
     if(ctx->factor().size() == 1) return v1;
     ass(v1);
-    int c1 = ctx->STAR().size(), c2 = ctx->DIV().size(), c3 = ctx->IDIV().size(), c4 = ctx->MOD().size();
-    vector<OP> am;
-    OP TMP;
-    for(int i = 0; i < c1; ++i)
-    am.push_back({1, (int)ctx->STAR(i)->getSymbol()->getTokenIndex()});
-    for(int i = 0; i < c2; ++i)
-    am.push_back({2, (int)ctx->DIV(i)->getSymbol()->getTokenIndex()});
-    for(int i = 0; i < c3; ++i)
-    am.push_back({3, (int)ctx->IDIV(i)->getSymbol()->getTokenIndex()});
-    for(int i = 0; i < c4; ++i)
-    am.push_back({4, (int)ctx->MOD(i)->getSymbol()->getTokenIndex()});
-    std::sort(am.begin(), am.end(),cp);
+    
+    string opp = ctx->getText();
+    opp.erase(0,ctx->factor(0)->getText().length());
     dvar tmp = v1[0];
-    for(int i = 0; i < am.size() ; ++i)
+    for(int i = 1; i < ctx->factor().size() ; ++i)
     {
-      v2 = visit(ctx->factor(i + 1)).as<vector<dvar>>();
+      v2 = visit(ctx->factor(i)).as<vector<dvar>>();
       ass(v2);
-      switch (am[i].flag)
+      switch (opp[0])
       {
-        case 1:
+        case '*':
         tmp *= v2[0];
+        opp.erase(0,ctx->factor(i)->getText().length() + 1);
         break;
 
-        case 2:
-        tmp = dvar((double)tmp / (double)v2[0]);
-        break;
-
-        case 3:
-        tmp /= v2[0];
+        case '/':
+        if(opp[1] == '/')
+        {
+      
+          tmp /= v2[0];
+          opp.erase(0,ctx->factor(i)->getText().length() + 2);
+        }
+        else
+        {
+          tmp = dvar((double)tmp / (double)v2[0]);
+          opp.erase(0,ctx->factor(i)->getText().length() + 1);
+        }
+        
         break;
         
-        case 4:
+        case '%':
         tmp %= v2[0];
+        opp.erase(0,ctx->factor(i)->getText().length() + 1);
         break;
       }
     }
