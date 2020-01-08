@@ -14,7 +14,6 @@ using std::vector, std::string,std::cout, std::endl;
 enum flowName{is_break, is_return, is_continue};
 int foo = 0;//  recursion state
 std::vector<std::map<std::string, dvar>> the_stack; //variables
-std::map<string,dvar> curvar; //variables of curent stack
 std::map<std::string , Python3Parser::SuiteContext*> suite; // suite of function
 std::map<std::string, Python3Parser::TypedargslistContext*> tyarg; // argslist of function
 void ass(vector<dvar> & v)
@@ -44,7 +43,25 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     std::map<string,dvar>v1;
     the_stack.push_back(v1);
     ++foo;
-    return visitChildren(ctx);
+    vector<flowName> v;
+    antlrcpp::Any tmp;
+
+    for(int i = 0; i < ctx->stmt().size(); ++i)
+    {
+      tmp = visit(ctx->stmt(i));
+      if(tmp.is<vector<flowName>>())
+      {
+        v = tmp.as<vector<flowName>>();
+        if (v[0] == is_return) 
+        {
+          
+          return nullptr;
+        }
+      }
+      
+    }
+    
+    return nullptr;
   }
 
   virtual antlrcpp::Any visitFuncdef(Python3Parser::FuncdefContext *ctx) override {
@@ -59,18 +76,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
   }
 
   virtual antlrcpp::Any visitTypedargslist(Python3Parser::TypedargslistContext *ctx) override {
-    int i = 0;
-    for(i = 0; i < ctx->tfpdef().size() - ctx->test().size(); ++i)
-        curvar[ctx->tfpdef(i)->NAME()->toString()] = dvar(); 
-
-        for(i = 0; i < ctx->test().size(); ++i)
-        {
-            vector<dvar> v1 = visit(ctx->test(i)).as<vector<dvar>>();
-            ass(v1);
-            size_t count = i + ctx->tfpdef().size() - ctx->test().size();
-            curvar[ctx->tfpdef(count)->NAME()->toString()] = v1[0];
-        }
-    return nullptr;
+    return visitChildren(ctx);
   }
 
   virtual antlrcpp::Any visitTfpdef(Python3Parser::TfpdefContext *ctx) override {
@@ -180,6 +186,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     }
     if(ctx->return_stmt())
     return visit(ctx->return_stmt());
+    return (vector<dvar>());
   }
 
   virtual antlrcpp::Any visitBreak_stmt(Python3Parser::Break_stmtContext *ctx) override {
@@ -194,6 +201,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     if(ctx->testlist() == nullptr) return (vector<flowName>(1,is_return));
     vector<dvar> v=visit(ctx->testlist()).as<vector<dvar>>();
     ass(v);
+    
     return v;
   }
 
@@ -211,6 +219,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     {
       v = visit(ctx->test(i)).as<vector<dvar>>();
       ass(v);
+      
       if((bool)v[0]) 
       {
           return visit(ctx->suite(i));
@@ -224,6 +233,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
   virtual antlrcpp::Any visitWhile_stmt(Python3Parser::While_stmtContext *ctx) override {
     vector<flowName> v; antlrcpp::Any tmp;
     vector<dvar> v1;
+    
     while(true)
     {
       v1 = visit(ctx->test()).as<vector<dvar>>();
@@ -404,33 +414,11 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
     am.push_back({4, (int)ctx->MOD(i)->getSymbol()->getTokenIndex()});
     std::sort(am.begin(), am.end(),cp);
     dvar tmp = v1[0];
-    
-    string ope = ctx->getText();
-    vector<int> opp;
-    for(int i = 0;i < ope.length(); ++i) 
-    {
-        if(ope[i] == '*')
-        opp.push_back(1);
-        if(ope[i] == '/' && ope[i + 1] == '/')
-        {
-            opp.push_back(3);
-            ++i;
-            continue;
-        }
-        if(ope[i] == '/' && ope[i + 1] != '/')
-        opp.push_back(2);
-     
-        if(ope[i] == '%')
-        opp.push_back(4);
-      
-    }
-    
-
-    for(int i = 0; i < opp.size() ; ++i)
+    for(int i = 0; i < am.size() ; ++i)
     {
       v2 = visit(ctx->factor(i + 1)).as<vector<dvar>>();
       ass(v2);
-      switch (opp[i])
+      switch (am[i].flag)
       {
         case 1:
         tmp *= v2[0];
@@ -493,8 +481,9 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
               if(i != v.size() - 1) cout << ' ';
             }
             cout << '\n';
-            
-            return vector<dvar>();
+            if(!v.empty())
+            v.clear();
+            return v;
 
         }
         else if (funcname == string("int"))
@@ -531,7 +520,8 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
         {
           ++foo;
           vector<dvar> v1;
-          curvar.clear();
+         
+          std::map<string,dvar> curvar;
           std::map<string,dvar>::iterator iter;
           std::map<string,dvar> globalvar = the_stack[0];
           iter = globalvar.begin();
@@ -543,12 +533,22 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
           if(tyarg[funcname])
           {
             int i = 0;
-            antlrcpp::Any NTMP= visit(tyarg[funcname]);
-            if(ctx->trailer()->arglist())
+            for(i = 0; i < tyarg[funcname]->tfpdef().size() - tyarg[funcname]->test().size(); ++i)
+            curvar[tyarg[funcname]->tfpdef(i)->NAME()->toString()] = dvar(); // 记录未赋初值的形参
+
+            for(i = 0; i < tyarg[funcname]->test().size(); ++i)
+            {
+              v1 = visit(tyarg[funcname]->test(i)).as<vector<dvar>>();
+              ass(v1);
+              size_t count = i + tyarg[funcname]->tfpdef().size() - tyarg[funcname]->test().size();
+              curvar[tyarg[funcname]->tfpdef(count)->NAME()->toString()] = v1[0]; // 初始化形参
+            }
+
+            if(ctx->trailer()->arglist() != nullptr)
             {
               for(i = 0; i < ctx->trailer()->arglist()->argument().size(); ++i)
               {
-                if(ctx->trailer()->arglist()->argument(i)->NAME()) 
+                if(ctx->trailer()->arglist()->argument(i)->NAME()) // key
                 {
                   v1 = visit(ctx->trailer()->arglist()->argument(i)->test()).as<vector<dvar>>();
                   ass(v1);
@@ -570,9 +570,14 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
           the_stack.push_back(curvar);
           antlrcpp::Any tmp = visit(suite[funcname]);
           --foo;
+        
           the_stack.pop_back();
+       
+          
           if(check(tmp)) return tmp;
-          return vector<dvar>();
+          if(!v1.empty())
+          v1.clear();
+          return v1;
         }
         
 
@@ -645,6 +650,7 @@ virtual antlrcpp::Any visitFile_input(Python3Parser::File_inputContext *ctx) ove
       v1 = visit(ctx->test(i)).as<vector<dvar>>();
       for(int j = 0; j < v1.size(); ++j)
       v2.push_back(v1[j]);
+      
     }
     return v2;
   }
