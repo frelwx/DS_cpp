@@ -31,16 +31,13 @@ class dvar
     double fvar;
     std::string svar;
     typeName type;
-
     int flag;
     
     public:
     dvar()
     {
         type = is_none;
-        flag = 1;
         svar = "None";
-        bvar = false;
     }
     dvar& operator= (const dvar & tmp)
     {
@@ -83,24 +80,18 @@ class dvar
 
             case 'T' :
             {
-                if(s == string("True"))
-                {
-                    type = is_bool;
-                    bvar = true;
-                    break;
-                }
-                
-                
+                 type = is_bool;
+                 bvar = true;
+                break; 
             }
             case 'F' :
             {
 
-                if(s == string("False"))
-                {
-                    type = is_bool;
-                    bvar = false;
-                    break;
-                }
+               
+                type = is_bool;
+                bvar = false;
+                break;
+                
 
                 
             }
