@@ -83,24 +83,24 @@ class dvar
 
             case 'T' :
             {
-                if(s == string("True"))
-                {
+                
+                
                     type = is_bool;
                     bvar = true;
                     break;
-                }
+                
                 
                 
             }
             case 'F' :
             {
 
-                if(s == string("False"))
-                {
+                
+                
                     type = is_bool;
                     bvar = false;
                     break;
-                }
+                
 
                 
             }
